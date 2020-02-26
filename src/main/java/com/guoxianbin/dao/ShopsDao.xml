@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.guoxianbin.dao.ShopsDao">
+ 	<resultMap type="Shops" id="smap">
+ 		<id property="id" column="id"/>
+ 		<result property="name" column="name"/>
+ 		<result property="ename" column="ename"/>
+ 		<result property="size" column="size"/>
+ 		<result property="price" column="price"/>
+ 		<result property="num" column="num"/>
+ 		<result property="bp" column="bp"/>
+ 		<result property="pic" column="pic"/>
+ 		<collection property="type" ofType="Type" select="se" column="id"></collection>
+ 		<collection property="brand" ofType="Brand" select="see" column="id"></collection>
+ 	</resultMap>
+ 	<select id="list" resultMap="smap">
+ 		select * from shops
+ 		<where>
+ 			<if test="tname != null and tname !=''">
+ 			and id in(SELECT id FROM td where tid in(SELECT tid FROM type where tname like concat('%',#{tname},'%')))
+ 			</if>
+ 			<if test="bname != null and bname !=''">
+ 			and id in(SELECT id FROM td where bid in(SELECT bid FROM brand where bname like concat('%',#{bname},'%')))
+ 			</if>
+ 			<if test="p1 !=null and p1!='' and p2!= null and p2!=''">
+ 			and price between #{p1} and #{p2}
+ 			</if>
+ 			<if test="name !=null and name !=''">
+ 			and name like concat('%',#{name},'%')
+ 			</if>
+ 			<if test="ename !=null and ename !=''">
+ 			and ename like concat('%',#{ename},'%')
+ 			</if>
+ 			<if test="bq !=null and bq !=''">
+ 			and bq like concat('%',#{bq},'%')
+ 			</if>
+ 		</where>
+ 	</select>
+ 	<select id="se" resultType="Type">
+ 		SELECT * FROM td t LEFT JOIN type y on (t.tid=y.tid) and t.id=#{id}
+ 	</select>
+ 	<select id="see" resultType="Brand">
+ 		SELECT * FROM td d LEFT JOIN brand b on (d.bid=b.bid) and d.id=#{id}
+ 	</select>
+ 	
+ 	<insert id="addsh">
+ 	insert into shops values(#{id},#{name},#{ename},#{size},#{price},#{num},#{bq},#{pic})
+ 	</insert>
+ 	<insert id="addt">
+ 	insert into td values(#{id},#{zhong},#{pin})
+ 	</insert>
+ </mapper>
